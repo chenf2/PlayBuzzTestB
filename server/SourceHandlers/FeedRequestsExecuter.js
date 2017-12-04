@@ -1,42 +1,64 @@
-const express = require('express');
-const router = express.Router();
-const feedLoader = require('../feedLoader');
-const providerUrlComposer = require('../providerFeedRequestComposer');
-const feedExecuter = require('../SourceHandlers/FeedRequestsExecuter');
-const feedUrlExecuter = require('../SourceHandlers/FeedUrlExecuter');
+'use strict';
 
-router.get('/getFeed', (req, res) => {
+const request = require('request');
+const objectPath = require("object-path");
+const configuration = require('../config/generalConfig');
+const clientReplayPoco = require("../clientPocos/clientPoco").default;
 
-  let feedsList;
-  feedLoader.feedData.getFeedList().then((feedsList) => {
-    let selectedFeed = selectRandomFeed(feedsList);
+let getFeedDataFromProvider =   function(providerFeedRequestData){
 
-    if(selectedFeed.source.toLowerCase() == 'url') {
-      res.json(feedUrlExecuter.urlFeedExecuter.urlClientReplayBuilder(selectedFeed));
-    } else {
-      let providerFeedRequestData =  providerUrlComposer.providrComoser.getProviderUrl(selectedFeed.source,selectedFeed.videoId);
+  let options = configuration.config.options;
 
-      if(providerFeedRequestData.error) {
-        //not supported publisher
-        res.json( 'not supported publisher');
-        return;
-      }
+  if (providerFeedRequestData.error)
+    return; //** Need error message to the user */
 
-      feedExecuter.feedsRequestExe(providerFeedRequestData).then(function(response){
-        res.json(response);
-      });
-    }
+  return  getTite(options,providerFeedRequestData).then(function(result) {
+    return getViewsCount(options,providerFeedRequestData,result)
+  }).then(function(result) {
+    return result;
   }).catch(function(){
     //handel the exception write to log...
   });;
+};
 
-});
+let getTite = function(options,providerFeedRequestData){
+  return new Promise(function(resolve, reject){
+    request.get(providerFeedRequestData.feedUrl,options,function(err,res,body){
 
-function selectRandomFeed(feedsList)
-{
-  let feedLength = feedsList.items.length;
-  let selectedItem = Math.floor(Math.random() * feedLength);
-  return feedsList.items[selectedItem];
-}
+      if(err) //TODO: handle err
+        reject('error');
 
-module.exports = router;
+      let replayBody = JSON.parse(res.body);
+
+      let  title = objectPath.get(replayBody,providerFeedRequestData.feedTitle);
+      resolve(title);
+
+    });
+
+  })
+};
+
+let  getViewsCount = function(options,providerFeedRequestData,title){
+  return new Promise(function(resolve, reject){
+    request.get(providerFeedRequestData.statisticsUrl,options,
+      function(err,res,body){
+
+        if(err) //TODO: handle err
+          reject('error');
+
+        let replayBody = JSON.parse(res.body);
+        let count = objectPath.get(replayBody,providerFeedRequestData.viewCount);
+        let clientResult = new clientReplayPoco();
+
+        clientResult.title = title || '';
+        clientResult.url = providerFeedRequestData.playerUrl;
+        clientResult.views = count;
+
+        resolve(clientResult);
+      });
+  })
+};
+
+
+exports.feedsRequestExe = getFeedDataFromProvider;
+  
