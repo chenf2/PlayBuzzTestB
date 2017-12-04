@@ -26,8 +26,10 @@ router.get('/getFeed', (req, res) => {
         res.json(response);
       });
     }
-  });
-
+  }).catch(function(){
+    //handel the exception write to log...
+  });;
+  
 });
 
 function selectRandomFeed(feedsList)
