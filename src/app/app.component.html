@@ -1,0 +1,30 @@
+<div class="container">
+
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="display-3">Video Feed</h1>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="errorOnResponse">
+    <div class="alert alert-danger" role="alert">
+      Error from server
+    </div>
+  </div>
+
+  <div class="row text-center justify-content-md-center" *ngIf="url">
+    <div class="col">
+      <div class="card">
+        <iframe class="card-img-top" [src]="getEmbedUrl()" height="400" style="border:none;overflow:hidden"
+                scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>
+        <div class="card-body">
+          <h4 class="card-title">{{title || "Unnamed Video"}}</h4>
+          <p class="card-text">
+            {{views || 0}} views
+          </p>
+          <a [href]="url" class="btn btn-primary" target="_blank">Go to video</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

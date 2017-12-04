@@ -1,0 +1,14 @@
+{
+    "youtube":
+
+        {
+            "providerName": "youtube",
+            "providerApiUrl":"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={videoID}&fields=items(id%2Csnippet)&key={ProviderKey}",
+            "providerKey": "AIzaSyC2KJiUWCg-gVPT-bcr8fsIVRCHe897AGo",
+            "titlePathInReplay": "items.0.snippet.title",
+            "statisticsUrl":"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={videoID}&key={ProviderKey}",
+            "viewCountPathInReplay": "items.0.statistics.viewCount",
+            "playerUrl": "https://www.youtube.com/embed/{videoID}"
+        }
+    
+  }
