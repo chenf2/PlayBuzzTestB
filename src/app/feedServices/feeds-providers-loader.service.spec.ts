@@ -12,6 +12,5 @@ describe('FeedsProvidersLoaderService', () => {
   it('should be created', inject([FeedsProvidersLoaderService], (service: FeedsProvidersLoaderService) => {
     expect(service).toBeTruthy();
 
-    //
   }));
 });
