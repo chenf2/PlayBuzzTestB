@@ -6,7 +6,8 @@ class clientPoco{
     this.title = null;
     this.url = null;
 
-  
+    //this is for test
+    this.url2 = null;
   }
 }
 
